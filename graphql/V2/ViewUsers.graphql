@@ -1,0 +1,8 @@
+query ViewUser {
+  users(query: "a") {
+    id
+    name
+    email
+    age
+  }
+}

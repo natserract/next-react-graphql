@@ -1,0 +1,20 @@
+
+fragment Shared_Lang on Continent {
+  name
+}
+
+fragment Shared_Country on Country {
+  name
+  phone
+}
+
+query Countries {
+  countries {
+    code
+    ...Shared_Country
+  }
+
+  continents {
+    ...Shared_Lang
+  }
+}

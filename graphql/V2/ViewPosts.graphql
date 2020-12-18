@@ -1,0 +1,15 @@
+#ViewPosts.graphql
+
+query Posts {
+  posts(query: "a") {
+    	id
+    	title
+    	body
+    	author {
+        id
+    		name
+        email
+  		}
+  }
+}
+

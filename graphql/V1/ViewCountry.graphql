@@ -1,0 +1,15 @@
+query Country($code: ID!) {
+  country(code: $code) {
+    name
+    phone
+    currency
+  }
+}
+
+# query Country {
+#   country(code: "AD") {
+#     name
+#     phone
+#     currency
+#   }
+# }

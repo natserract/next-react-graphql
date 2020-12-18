@@ -1,0 +1,11 @@
+mutation AddUser($email: String! $name: String!, $age: Int) {
+  createUser(data: { 
+    email: $email 
+    name: $name
+    age: $age
+  } ) {
+    name
+    email
+    age
+  }
+}
