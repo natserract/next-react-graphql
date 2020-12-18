@@ -1,11 +1,11 @@
-/// <reference types="next" />
-/// <reference types="next/types/global" />
-/// <reference types="next-images" />
+// / <reference types="next" />
+// / <reference types="next/types/global" />
+// / <reference types="next-images" />
 
-declare module "*.scss" {
-    const value: string;
-    export default value;
-}
+declare module '*.scss' {
+    const content: {[className: string]: string};
+    export = content;
+  }
 
 declare module "*.png" {
     const value: string;

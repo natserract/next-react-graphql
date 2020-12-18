@@ -1,8 +1,10 @@
 const Dotenv = require("dotenv-webpack");
-const withImages = require('next-images')
+const withImages = require('next-images');
+const withSass = require('@zeit/next-sass');
+const withPlugins = require( 'next-compose-plugins' );
 
-const nextConfig = withImages({
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+const NextAppConfig = withImages({
+  webpack: (config) => {
     config.module.rules.push({
         test: /\.(graphql|gql)$/,
         exclude: /node_modules/,
@@ -18,4 +20,14 @@ const nextConfig = withImages({
   }
 });
 
-module.exports = nextConfig;
+module.exports = withPlugins([ 
+  [
+    withSass, {
+      cssModules: true,
+        cssLoaderOptions: {
+          importLoaders: 1,
+          localIdentName: '[local]___[hash:base64:5]',
+        }
+    }
+  ]
+], NextAppConfig );
