@@ -19,6 +19,9 @@ export default function Navigation(props: NavigationProps) {
                 <Link href="/user/create-user">
                     <a>Create User</a>
                 </Link>
+                <Link href="/step">
+                    <a>Go To Step</a>
+                </Link>
             </div>
         </header>
     );
