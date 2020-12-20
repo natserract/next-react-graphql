@@ -1,75 +1,28 @@
-import React, { useState, useEffect, memo } from 'react';
-import { useForm, FormProvider, useFormContext, Control, useWatch } from 'react-hook-form';
+import React, { useState, useEffect } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import Router, { useRouter } from 'next/router';
-import { useCtx, useCtxDispatch } from '../../context/utils/utils';
-import { StepActionStatus } from '../../context/models/step.model';
+import { useCtx, useCtxDispatch } from '../../utils/utils';
 import Button from '@material-ui/core/Button';
-import { StepActions } from '../../context/actions/step.action';
-
-const StepOneComponent = ({ defaultValue, index }) => {
-    const { register } = useFormContext();
-
-    return (
-        <React.Fragment>
-            <div className="form-group">
-                <label htmlFor="name">Name *</label>
-                <input type="text" name="inputName" placeholder="Name" defaultValue={defaultValue[index] !== undefined ? defaultValue[index].fields.inputName : ''} ref={register({ required: true })} />
-            </div>
-
-
-            <div className="form-group">
-                <label htmlFor="email">Email *</label>
-                <input type="text" name="inputEmail" placeholder="Email" maxLength={5} defaultValue={defaultValue[index] !== undefined ? defaultValue[index].fields.inputEmail : ''} ref={register({ required: true, maxLength: 5 })} />
-            </div>
-        </React.Fragment>
-    )
-}
-
-const StepTwoComponent = ({ defaultValue, index }) => {
-    const { register } = useFormContext();
-
-    return (
-        <React.Fragment>
-            <div className="form-group">
-                <label htmlFor="phone">Phone *</label>
-                <input type="phone" name="inputPhone" placeholder="Phone" defaultValue={defaultValue[index] !== undefined ? defaultValue[index].fields.inputPhone : ''} ref={register({ required: true })} />
-            </div>
-        </React.Fragment>
-    )
-}
-
-const StepThreeComponent = ({ defaultValue, index }) => {
-    const { register } = useFormContext();
-
-    return (
-        <React.Fragment>
-            <div className="form-group">
-                <label htmlFor="age">Age *</label>
-                <input type="number" name="inputAge" placeholder="Age" defaultValue={defaultValue[index] !== undefined ? defaultValue[index].fields.inputAge : ''} ref={register({ required: true })} />
-            </div>
-
-        </React.Fragment>
-    )
-}
-
+import { useUniqueArray, useWindowOnLoad, isArrayHaveDuplicate } from '../../utils/utils';
+import { initFormData, setActivePageIndex, updateStepItems, dispatchNewFormData, dispatchFormDataResult, clearFormDaata } from './[step].service';
+import { fieldsForm, IsShowed, dispatchListOfComponent } from './[stepId.static';
 
 function Step() {
+    const { stepContext } = useCtx();
     const { dispatchStepContext } = useCtxDispatch();
-    const { LOAD_STEP, ADD_FORM_DATA_DEFAULT, ADD_FORM_DATA_PREV, CLEAR_FORM_DATA, REPLACE_DATA } = StepActionStatus;
 
     const routeConfig = useRouter();
-    const { query: { stepId }, events } = routeConfig;
-
-    const { stepContext } = useCtx();
+    const { query: { stepId } } = routeConfig;
 
     const [state, setState] = useState<{ checked: boolean }>({
         checked: false
     });
     const [prevUrl, setPrevUrl] = useState(stepId);
+    const [showResultData, setShowResultData] = useState(false);
 
     let firstIndexData: string | string[] = null;
     let lastIndexData: string | string[] = null;
-    let findPageIndex = null;
+    let getPageIndex = null;
     let storedUniqueArray = [];
     let isHaveDuplicateItem = false;
     let activeStepId = null;
@@ -80,7 +33,7 @@ function Step() {
         })
     }
 
-    const { data, formData } = stepContext;
+    const { componentContainer, storedFormData, formDataResult } = stepContext;
     const methods = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange'
@@ -88,6 +41,7 @@ function Step() {
     const {
         register,
         handleSubmit,
+        control,
         reset,
         formState,
     } = methods;
@@ -97,158 +51,74 @@ function Step() {
         setPrevUrl(stepId);
     }
 
-    const IsShowed = ({ control }: { control: Control }) => {
-        const renderInput = useWatch({
-            control,
-            name: 'inputCheck',
-            defaultValue: state.checked
-        });
-
-        if (renderInput) {
-            return (
-                <div className="form-group">
-                    <label htmlFor="age">Age </label>
-                    <input type="text" name="inputAge" ref={register} />
-                </div>
-            )
-        }
-        return null;
-    }
-
-    const onSubmit = handleSubmit(async (data) => {
+    const onSubmit = handleSubmit((data) => {
         // Is valid works if you handle with mode 'onChange' -> useForm()
         if (isValid) {
-            dispatchNewFormData(data);
-            Router.push(`/step/${parseInt(stepId.toString()) + 1}`);
+            dispatchNewFormData(dispatchStepContext, data, stepId.toString());
+
+            if (stepId !== lastIndexData) {
+                Router.push(`/step/${parseInt(stepId.toString()) + 1}`);
+            } else {
+                setShowResultData(true);
+                dispatchFormDataResult(dispatchStepContext);
+                clearFormDaata(dispatchStepContext);
+                
+                Router.replace(`/step/${firstIndexData}`);
+
+                // If done after async process 
+                // you can dispatch CLEAR_FORM_DATA_RESULT
+            }
         }
     });
 
+    useWindowOnLoad(() => dispatchListOfComponent(dispatchStepContext, storedFormData, getPageIndex));
 
-    const dispatchNewFormData = (data): void => {
-        dispatchStepContext({
-            type: ADD_FORM_DATA_DEFAULT,
-            payload: {
-                defaultFields: {
-                    key: stepId.toString(),
-                    fields: data
-                }
-            }
-        });
+    setActivePageIndex(storedFormData, stepId.toString(), (o) => {
+        getPageIndex = o;
+    });
 
-        dispatchStepContext({
-            type: ADD_FORM_DATA_PREV,
-            payload: {
-                allFields: [{
-                    key: stepId.toString(),
-                    fields: data
-                }]
-            }
-        });
-    }
-
-    if (typeof window !== "undefined") {
-        window.onload = (_event) => {
-            dispatchListOfComponent();
-        }
-    }
-
-    for (var i = 0; i < stepContext.prevFormData.length; i++) {
-        if (stepContext.prevFormData[i].key == stepId.toString()) {
-            findPageIndex = i;
-            break;
-        }
-    }
-
-
-    const dispatchListOfComponent = () => {
-        return dispatchStepContext({
-            type: LOAD_STEP,
-            payload: {
-                data: [
-                    {
-                        key: '1',
-                        name: `Step 1`,
-                        component: <StepOneComponent key={'1'} index={findPageIndex} defaultValue={stepContext.prevFormData !== null ? stepContext.prevFormData : "undefined"} />
-                    },
-                    {
-                        key: '2',
-                        name: `Step 2`,
-                        component: <StepTwoComponent key={'2'} index={findPageIndex} defaultValue={stepContext.prevFormData !== null ? stepContext.prevFormData : "undefined"} />
-                    },
-                    {
-                        key: '3',
-                        name: `Step 3`,
-                        component: <StepThreeComponent key={'3'} index={findPageIndex} defaultValue={stepContext.prevFormData !== null ? stepContext.prevFormData : "undefined"} />
-                    }
-                ]
-            }
-        });
-    }
-
-    // Initial context state 
-    // for default value form
-    const fieldsForm = {
-        inputName: '',
-        inputAge: '',
-        inputEmail: '',
-        inputPhone: ''
-    }
-
-    const dispatchInitFormData = () => {
-        return dispatchStepContext({
-            type: ADD_FORM_DATA_DEFAULT,
-            payload: {
-                defaultFields: {
-                    key: stepId.toString(),
-                    fields: fieldsForm
-                }
-            }
-        })
+    const prevPageHandler = () =>{
+        Router.push(`/step/${parseInt(stepId.toString()) - 1}`);
+        setShowResultData(false);
     }
 
     useEffect(() => {
-        dispatchInitFormData();
+        initFormData(
+            dispatchStepContext,
+            stepId.toString(),
+            fieldsForm
+        );
+
         activeStepId = stepId.toString();
     }, []);
 
     useEffect(() => {
-        dispatchListOfComponent();
-        activeStepId = stepId.toString();
-
-        const dataPrevForm = stepContext.prevFormData;
-
-        stepContext.prevFormData.map(v => v.key).sort().sort((a, b) => {
-            if (a === b) isHaveDuplicateItem = true;
-        });
+        dispatchListOfComponent(dispatchStepContext, storedFormData, getPageIndex);
+        isHaveDuplicateItem = isArrayHaveDuplicate(storedFormData);
 
         // If have duplicate Items
-        let unique: Array<any> = dataPrevForm.filter((set => f => !set.has(f.key) && set.add(f.key))(new Set));
+        const resultNewArray: Array<any> = useUniqueArray(storedFormData);
         if (isHaveDuplicateItem) {
-            storedUniqueArray = unique;
+            storedUniqueArray = resultNewArray;
         }
+
+        activeStepId = stepId.toString();
+
     }, [stepId]);
 
     useEffect(() => {
         if (isHaveDuplicateItem) {
-            dispatchStepContext({
-                type: CLEAR_FORM_DATA
-            });
-
-            // No need key again
-            dispatchStepContext({
-                type: REPLACE_DATA,
-                payload: {
-                    replaceFields: storedUniqueArray.reverse()
-                }
-            });
-
+            updateStepItems(
+                dispatchStepContext,
+                storedUniqueArray.reverse()
+            );
         };
 
     }, [stepId, isHaveDuplicateItem, activeStepId]);
 
-    if (stepContext.data.length !== 0) {
-        firstIndexData = stepContext.data[0].key;
-        lastIndexData = stepContext.data[data.length - 1].key;
+    if (componentContainer.length !== 0) {
+        firstIndexData = componentContainer[0].key;
+        lastIndexData = componentContainer[componentContainer.length - 1].key;
     }
 
     return (
@@ -265,21 +135,22 @@ function Step() {
                         />
                     </div>
 
-                    {data.map((item, index) => {
+
+                    {componentContainer.map(item => {
                         if (stepId !== undefined) {
                             if (stepId.toString() === item.key) {
-                                { JSON.stringify(data) }
-                                return data[parseInt(item.key) - 1].component;
+                                return componentContainer[parseInt(item.key) - 1].component;
                             }
                         }
                     })}
 
-                    {/* <IsShowed control={control} /> */}
+                    {/* implement of useWatch, be like ngModel */}
+                    <IsShowed state={state} control={control} />
 
                     {/* Button Navigation */}
                     <Button
                         variant="contained"
-                        onClick={() => Router.push(`/step/${parseInt(stepId.toString()) - 1}`)}
+                        onClick={() => prevPageHandler()}
                         disabled={stepId === firstIndexData ? true : false}>
                         Back
                     </Button>
@@ -301,23 +172,15 @@ function Step() {
                                 Next Step
                             </Button>
                         )}
-
-                    <br />
-                    <br />
-                    <br />
-
-                    <br />
-
-                    {/* {JSON.stringify(`Line activeformData in step ${stepId}`)}
-                    {JSON.stringify(stepContext.formData)} */}
-
-                    <br />
-                    {JSON.stringify(`Line AllData`)}
-                    {JSON.stringify(stepContext.prevFormData)}
-                    {/* {JSON.stringify(formState)} */}
-
                 </form>
             </FormProvider>
+
+            {showResultData ? (
+                <div>
+                    <h1>You're result: </h1>
+                    <p>{JSON.stringify(formDataResult)}</p>
+                </div>
+            ) : null }
         </React.Fragment>
     )
 }

@@ -2,12 +2,13 @@ import { StepRootState, StepActionStatus } from '../models/step.model';
 import { StepActions } from '../actions/step.action';
 
 export const stepInitialState: StepRootState = {
-    data: [],
+    componentContainer: [],
     formData: {
         key: '',
         fields: {}
     },
-    prevFormData: []
+    storedFormData: [],
+    formDataResult: []
 };
 
 export const StepReducer = (state: StepRootState = stepInitialState, action: StepActions): StepRootState => {
@@ -15,7 +16,7 @@ export const StepReducer = (state: StepRootState = stepInitialState, action: Ste
         case StepActionStatus.LOAD_STEP: {
             return {
                 ...state,
-                data: action.payload.data
+                componentContainer: action.payload.data
             };
         }
         case StepActionStatus.ADD_FORM_DATA_DEFAULT: {
@@ -27,19 +28,32 @@ export const StepReducer = (state: StepRootState = stepInitialState, action: Ste
         case StepActionStatus.ADD_FORM_DATA_PREV: {
             return {
                 ...state,
-                prevFormData: [...state.prevFormData.concat(action.payload.allFields)].reverse().sort()
+                storedFormData: [...state.storedFormData.concat(action.payload.allFields)].reverse().sort()
+            }
+        }
+        case StepActionStatus.FORM_DATA_RESULT: {
+            return {
+                ...state,
+                formDataResult: [...state.formDataResult.concat(state.storedFormData)]
             }
         }
         case StepActionStatus.REPLACE_DATA: {
             return {
                 ...state,
-                prevFormData: action.payload.replaceFields
+                storedFormData: action.payload.replaceFields
             }
         }
         case StepActionStatus.CLEAR_FORM_DATA: {
             return {
                 ...state,
-                prevFormData: []
+                formData: stepInitialState.formData,
+                storedFormData: []
+            }
+        }
+        case StepActionStatus.CLEAR_FORM_DATA_RESULT: {
+            return {
+                ...state,
+                formDataResult: []
             }
         }
         default: throw new Error();

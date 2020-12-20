@@ -3,9 +3,9 @@ import React from 'react';
 import { stepInitialState, StepReducer } from './reducers/step.reducer';
 import { StepActions } from './actions/step.action';
 import { StepRootState } from './models/step.model';
-import { useReducer, useLocalStorageReducer } from './utils/utils';
+import { useReducer, useLocalStorageReducer } from '../utils/utils';
 
-type DispatchType<T> = (action: T) => void;
+export type DispatchType<T> = (action: T) => void;
 
 export const StepContext = React.createContext<StepRootState | undefined>(undefined);
 export const DispatchStepContext = React.createContext<DispatchType<StepActions> | undefined>(undefined);

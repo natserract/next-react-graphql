@@ -1,7 +1,8 @@
 export interface StepRootState {
-    data: StepData[];
+    componentContainer: StepData[];
     formData: StepDefaultField;
-    prevFormData: any;
+    storedFormData: StepDefaultField[];
+    formDataResult: StepDefaultField[];
 }
 
 export interface StepData {
@@ -20,6 +21,8 @@ export enum StepActionStatus {
     LOAD_STEP = '@@LOAD_STEP',
     ADD_FORM_DATA_DEFAULT = '@@ADD_FORM_DATA_DEFAULT',
     ADD_FORM_DATA_PREV = '@@ADD_FORM_DATA_PREV',
+    FORM_DATA_RESULT = '@@FORM_DATA_RESULT',
     REPLACE_DATA = '@@REPLACE_DATA',
-    CLEAR_FORM_DATA = '@@CLEAR_FORM_DATA'
+    CLEAR_FORM_DATA = '@@CLEAR_FORM_DATA',
+    CLEAR_FORM_DATA_RESULT = '@@CLEAR_FORM_DATA_RESULT'
 }
