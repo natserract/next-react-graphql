@@ -1,11 +1,12 @@
 ## Tools Used
 This project using various tools
-[GraphQL](https://graphql.org/learn/),
-[TypeScript](https://www.typescriptlang.org/docs/),
-[React](https://reactjs.org/docs/getting-started.html),
-[Next.js](https://nextjs.org/),
-[Apollo Client for React](https://www.apollographql.com/docs/react/),
-[GraphQL Code Generator](https://github.com/dotansimha/graphql-code-generator), etc),
+- [GraphQL](https://graphql.org/learn/),
+- [TypeScript](https://www.typescriptlang.org/docs/),
+- [React](https://reactjs.org/docs/getting-started.html),
+- [Next.js](https://nextjs.org/),
+- [Apollo Client for React](https://www.apollographql.com/docs/react/),
+- [React Hook Form](https://react-hook-form.com/),
+- [GraphQL Code Generator](https://github.com/dotansimha/graphql-code-generator), etc)
 
 ## Getting Started
 Create .env file for application environments
@@ -31,7 +32,7 @@ You can start editing the page by modifying `pages/index.js`. The page auto-upda
 
 Clone this repository and start in your local 
 - [Countries GraphQL API](https://github.com/trevorblades/countries),
-- [Modern GraphQL API](https://github.com/ian13456/modern-graphql-tutorial),
+- [Modern GraphQL API](https://github.com/ian13456/modern-graphql-tutorial)
 
 ## Deploy on Vercel
 
