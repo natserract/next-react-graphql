@@ -1,7 +1,7 @@
-import { StepRootState, StepActionStatus } from '../models/step.model';
 import { StepActions } from '../actions/step.action';
+import { StepRootState, StepActionStatus, StepData } from '../models/step.model';
 
-export const stepInitialState: StepRootState = {
+export const stepInitialStateWReducer = {
     componentContainer: [],
     formData: {
         key: '',
@@ -11,8 +11,17 @@ export const stepInitialState: StepRootState = {
     formDataResult: []
 };
 
-export const StepReducer = (state: StepRootState = stepInitialState, action: StepActions): StepRootState => {
-    switch(action.type) {
+export const stepInitialState: StepData = {
+    inputName: "",
+    inputPassword: "",
+    inputEmail: "",
+    inputPhone: "",
+    selectDrink: "",
+    gender: ""
+};
+
+export const StepReducer = (state = stepInitialStateWReducer, action: StepActions) => {
+    switch (action.type) {
         case StepActionStatus.LOAD_STEP: {
             return {
                 ...state,
@@ -46,7 +55,7 @@ export const StepReducer = (state: StepRootState = stepInitialState, action: Ste
         case StepActionStatus.CLEAR_FORM_DATA: {
             return {
                 ...state,
-                formData: stepInitialState.formData,
+                formData: stepInitialStateWReducer.formData,
                 storedFormData: []
             }
         }

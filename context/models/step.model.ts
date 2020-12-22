@@ -6,9 +6,12 @@ export interface StepRootState {
 }
 
 export interface StepData {
-    key: string | string[];
-    name: string;
-    component: JSX.Element;
+    inputName: string;
+    inputPassword: string;
+    inputEmail: string;
+    inputPhone: string;
+    selectDrink: string;
+    gender: "male" | "female" | string;
 }
 
 export interface StepDefaultField {
