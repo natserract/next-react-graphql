@@ -15,10 +15,7 @@ const schema = yup.object().shape({
 const StepOne = ({ pageId, firstPageId, lastPageId }) => {
     const methods = useForm({
         mode: 'onChange',
-        reValidateMode: 'onChange',
-        resolver: yupResolver(schema, {
-            abortEarly: false
-        })
+        resolver: yupResolver(schema)
     });
 
     const {
@@ -69,7 +66,6 @@ const StepOne = ({ pageId, firstPageId, lastPageId }) => {
                     ) : null}
 
                 </div>
-
 
                 <StepButton
                     pageId={pageId}

@@ -5,9 +5,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import StepButton from '../components/stepButton';
 import StepFormErrorLogs from '../components/validationLogs';
-import maleImg from '../../../public/assets/img/male.jpg';
-import femaleImg from '../../../public/assets/img/female.jpeg';
-// import femaleImg from '../../../../public/assets/img/female.jpeg';
+// import maleImg from '../../../public/assets/img/male.jpg';
+// import femaleImg from '../../../public/assets/img/female.jpeg';
 
 const schema = yup.object().shape({
     gender: yup.string().required('Select gender'),
@@ -18,9 +17,7 @@ const StepTwo = ({ pageId, firstPageId, lastPageId }) => {
     const methods = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
-        resolver: yupResolver(schema, {
-            abortEarly: false
-        })
+        resolver: yupResolver(schema)
     });
 
     const {
@@ -68,12 +65,13 @@ const StepTwo = ({ pageId, firstPageId, lastPageId }) => {
 
 
                 {renderInput === 'male' ? (
-                    <img src={maleImg} alt="" />
+                    <img src='/assets/img/male.jpg' alt="" />
+                    // <img src={maleImg} alt=""/>
                 ) : null}
 
 
                 {renderInput === 'female' ? (
-                    <img src={femaleImg} alt="" />
+                    <img src='/assets/img/female.jpg' alt="" />
                 ) : null}
             </form>
 

@@ -14,9 +14,7 @@ const StepThree = ({ pageId, firstPageId, lastPageId }) => {
     const methods = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
-        resolver: yupResolver(schema, {
-            abortEarly: false
-        })
+        resolver: yupResolver(schema)
     });
 
     const {
